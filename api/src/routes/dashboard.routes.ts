@@ -4,15 +4,28 @@ import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.get("/stats", authMiddleware, async (_req, res) => {
+router.get("/stats", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
+  const isSuperAdmin = user.role === "SUPER_ADMIN";
+  const organizationId = user.organizationId ?? null;
+
+  const baseWhere = isSuperAdmin ? {} : { organizationId: organizationId ?? undefined };
+
   const [customers, appointments, services, revenueResult] = await Promise.all([
-    prisma.customer.count(),
-    prisma.appointment.count(),
-    prisma.service.count(),
+    prisma.customer.count({
+      where: baseWhere,
+    }),
+    prisma.appointment.count({
+      where: baseWhere,
+    }),
+    prisma.service.count({
+      where: baseWhere,
+    }),
     prisma.appointment.aggregate({
       _sum: {
         amount: true,
       },
+      where: baseWhere,
     }),
   ]);
 
@@ -29,16 +42,22 @@ router.get("/stats", authMiddleware, async (_req, res) => {
   });
 });
 
-router.get("/overview", authMiddleware, async (_req, res) => {
+router.get("/overview", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
+  const isSuperAdmin = user.role === "SUPER_ADMIN";
+  const organizationId = user.organizationId ?? null;
+  const baseWhere = isSuperAdmin ? {} : { organizationId: organizationId ?? undefined };
+
   const [customers, appointments, services, pendingAppointments, revenueResult] = await Promise.all([
-    prisma.customer.count(),
-    prisma.appointment.count(),
-    prisma.service.count(),
+    prisma.customer.count({ where: baseWhere }),
+    prisma.appointment.count({ where: baseWhere }),
+    prisma.service.count({ where: baseWhere }),
     prisma.appointment.count({
-      where: { status: "PENDING" },
+      where: { ...baseWhere, status: "PENDING" },
     }),
     prisma.appointment.aggregate({
       _sum: { amount: true },
+      where: baseWhere,
     }),
   ]);
 

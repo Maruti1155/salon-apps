@@ -5,6 +5,7 @@ export interface AuthUser {
   id: number;
   email: string;
   role: string;
+  organizationId?: number | null;
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -35,6 +36,7 @@ const authMiddleware = (
       id: decoded.userId ?? decoded.id,
       email: decoded.email,
       role: decoded.role,
+      organizationId: decoded.organizationId ?? null,
     };
     return next();
   } catch (error) {

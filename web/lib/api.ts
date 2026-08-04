@@ -26,6 +26,17 @@ async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<T
     ...options,
   });
 
+  const contentType = response.headers.get("content-type") || "";
+
+  if (!contentType.includes("application/json")) {
+    const text = await response.text();
+    throw new Error(
+      response.ok
+        ? "Unexpected server response. Please try again."
+        : text?.slice(0, 180) || "Request failed"
+    );
+  }
+
   const data = (await response.json()) as T & { message?: string };
 
   if (!response.ok) {
