@@ -21,12 +21,21 @@ export default function HomePage() {
             Login
           </Link>
 
-          <Link
-            href="/register"
-            className="border border-black text-black py-3 rounded-lg hover:bg-gray-100 transition"
-          >
-            Create Account
-          </Link>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link
+              href="/register/parlor"
+              className="border border-black text-black py-3 rounded-lg hover:bg-gray-100 transition"
+            >
+              Register Parlor
+            </Link>
+
+            <Link
+              href="/register/user"
+              className="border border-black text-black py-3 rounded-lg hover:bg-gray-100 transition"
+            >
+              Register User
+            </Link>
+          </div>
         </div>
 
         <div className="mt-8 text-sm text-gray-500">

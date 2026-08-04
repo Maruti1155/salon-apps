@@ -22,7 +22,7 @@ const createToken = (user: { id: number; email: string; role: string; organizati
     },
   );
 
-router.post("/register", async (req, res) => {
+const registerParlorUser = async (req: any, res: any) => {
   const {
     firstName,
     lastName,
@@ -98,6 +98,95 @@ router.post("/register", async (req, res) => {
       email: user.email,
       role: user.role,
       organizationId: user.organizationId,
+    },
+  });
+};
+
+router.post("/register", registerParlorUser);
+router.post("/register-parlor", registerParlorUser);
+
+router.post("/register-user", async (req, res) => {
+  const { firstName, lastName, email, password, role, organizationId, phone } = req.body ?? {};
+
+  if (!firstName || !lastName || !email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "First name, last name, email, and password are required",
+    });
+  }
+
+  const normalizedEmail = String(email).trim().toLowerCase();
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
+
+  if (existingUser) {
+    return res.status(409).json({
+      success: false,
+      message: "Email already registered",
+    });
+  }
+
+  const normalizedRole = String(role || "CUSTOMER").toUpperCase();
+
+  if (!Object.values(Role).includes(normalizedRole as Role)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid role selected",
+    });
+  }
+
+  const targetOrgId = organizationId !== undefined && organizationId !== null && organizationId !== ""
+    ? Number(organizationId)
+    : null;
+
+  if (targetOrgId) {
+    const organization = await prisma.organization.findUnique({
+      where: { id: targetOrgId },
+    });
+
+    if (!organization) {
+      return res.status(404).json({
+        success: false,
+        message: "Organization not found",
+      });
+    }
+  }
+
+  const hashedPassword = await bcrypt.hash(String(password), 10);
+
+  const user = await prisma.user.create({
+    data: {
+      firstName: String(firstName).trim(),
+      lastName: String(lastName).trim(),
+      email: normalizedEmail,
+      password: hashedPassword,
+      role: normalizedRole as Role,
+      organizationId: targetOrgId,
+      parentId: null,
+    },
+  });
+
+  const token = createToken({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    organizationId: user.organizationId,
+  });
+
+  return res.status(201).json({
+    success: true,
+    message: "User registration successful",
+    token,
+    user: {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      organizationId: user.organizationId,
+      phone,
     },
   });
 });

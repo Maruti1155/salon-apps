@@ -14,6 +14,7 @@ export interface AuthResponse {
     lastName: string;
     email: string;
     role: string;
+    organizationId?: number | null;
   };
 }
 
@@ -67,6 +68,18 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 export const authApi = {
   register: (payload: unknown) =>
     request<AuthResponse>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  registerParlor: (payload: unknown) =>
+    request<AuthResponse>("/auth/register-parlor", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  registerUser: (payload: unknown) =>
+    request<AuthResponse>("/auth/register-user", {
       method: "POST",
       body: JSON.stringify(payload),
     }),

@@ -92,15 +92,27 @@ export default function LoginPage() {
           </p>
         )}
 
-        <p className="mt-6 text-center">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="font-semibold underline"
-          >
-            Register
-          </Link>
-        </p>
+        <div className="mt-6 space-y-3 text-center">
+          <p className="text-sm text-slate-600">
+            Don&apos;t have an account?
+          </p>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Link
+              href="/register/parlor"
+              className="rounded border border-black px-3 py-2 text-sm font-medium text-black hover:bg-gray-100"
+            >
+              Register Parlor
+            </Link>
+
+            <Link
+              href="/register/user"
+              className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            >
+              Register User
+            </Link>
+          </div>
+        </div>
       </div>
     </main>
   );

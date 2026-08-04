@@ -1,120 +1,50 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { authApi } from "@/lib/api";
-import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    mobile: "",
-    email: "",
-    password: "",
-  });
-
-  const [message, setMessage] = useState("");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    setMessage("");
-
-    try {
-      await authApi.register(formData);
-
-      setMessage("Registration successful");
-
-      setFormData({
-        firstName: "",
-        lastName: "",
-        mobile: "",
-        email: "",
-        password: "",
-      });
-      router.replace("/login");
-    } catch (error) {
-      setMessage(
-        error instanceof Error ? error.message : "Server connection failed"
-      );
-    }
-  };
-
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-3xl font-bold">
-          Create Account
-        </h1>
+    <main className="min-h-screen flex items-center justify-center bg-slate-100 px-4 py-10">
+      <div className="w-full max-w-3xl rounded-2xl bg-white p-8 shadow-lg">
+        <div className="mb-8 text-center">
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
+            Create Account
+          </p>
+          <h1 className="mt-3 text-3xl font-bold text-slate-900">
+            Choose your registration type
+          </h1>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            name="firstName"
-            value={formData.firstName}
-            placeholder="First Name"
-            className="w-full rounded border p-3"
-            onChange={handleChange}
-          />
-
-          <input
-            name="lastName"
-            value={formData.lastName}
-            placeholder="Last Name"
-            className="w-full rounded border p-3"
-            onChange={handleChange}
-          />
-
-          <input
-            name="mobile"
-            value={formData.mobile}
-            placeholder="Mobile Number"
-            className="w-full rounded border p-3"
-            onChange={handleChange}
-          />
-
-          <input
-            name="email"
-            type="email"
-            value={formData.email}
-            placeholder="Email"
-            className="w-full rounded border p-3"
-            onChange={handleChange}
-          />
-
-          <input
-            name="password"
-            type="password"
-            value={formData.password}
-            placeholder="Password"
-            className="w-full rounded border p-3"
-            onChange={handleChange}
-          />
-
-          <button
-            type="submit"
-            className="w-full rounded bg-black py-3 text-white hover:bg-gray-800"
+        <div className="grid gap-5 md:grid-cols-2">
+          <Link
+            href="/register/parlor"
+            className="rounded-2xl border-2 border-black bg-black p-6 text-left text-white transition hover:bg-gray-800"
           >
-            Register
-          </button>
-        </form>
+            <div className="mb-2 text-sm uppercase tracking-[0.2em] text-gray-300">
+              Register as
+            </div>
+            <div className="text-2xl font-bold">Parlor Owner</div>
+            <p className="mt-3 text-sm text-gray-200">
+              Create your salon or parlor business and manage staff, customers, services, and appointments.
+            </p>
+          </Link>
 
-        {message && (
-          <p className="mt-4 text-center text-sm text-red-600">{message}</p>
-        )}
+          <Link
+            href="/register/user"
+            className="rounded-2xl border-2 border-slate-200 bg-white p-6 text-left text-slate-900 transition hover:border-slate-400 hover:bg-slate-50"
+          >
+            <div className="mb-2 text-sm uppercase tracking-[0.2em] text-gray-500">
+              Register as
+            </div>
+            <div className="text-2xl font-bold">Normal User</div>
+            <p className="mt-3 text-sm text-slate-600">
+              Create a standard customer or staff account for an existing parlor organization.
+            </p>
+          </Link>
+        </div>
 
-        <p className="mt-6 text-center">
+        <p className="mt-8 text-center text-sm text-slate-600">
           Already have an account?{" "}
           <Link href="/login" className="font-semibold underline">
-            Login
+            Login here
           </Link>
         </p>
       </div>
