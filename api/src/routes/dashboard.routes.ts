@@ -1,22 +1,32 @@
 import { Router } from "express";
+import { prisma } from "../lib/prisma";
+import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = Router();
 
+router.get("/stats", authMiddleware, async (_req, res) => {
+  const [customers, appointments, services, revenueResult] = await Promise.all([
+    prisma.customer.count(),
+    prisma.appointment.count(),
+    prisma.service.count(),
+    prisma.appointment.aggregate({
+      _sum: {
+        amount: true,
+      },
+    }),
+  ]);
 
-router.get("/stats", async (req, res) => {
+  const revenue = Number(revenueResult._sum.amount ?? 0);
 
-  res.json({
+  return res.json({
     success: true,
-
     data: {
-      customers: 125,
-      appointments: 32,
-      services: 15,
-      revenue: 45000
-    }
+      customers,
+      appointments,
+      services,
+      revenue,
+    },
   });
-
 });
-
 
 export default router;

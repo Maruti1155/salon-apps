@@ -22,14 +22,22 @@ async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<T
   return data;
 }
 
-export async function apiFetch(
-  endpoint:string,
-  options?:RequestInit
-){
-  return fetch(
-    `${API_URL}${endpoint}`,
-    options
-  );
+export async function apiFetch(endpoint: string, options: RequestInit = {}) {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const headers = new Headers(options.headers || {});
+
+  if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  return fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
 }
 
 export const authApi = {
