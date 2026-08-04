@@ -4,6 +4,19 @@ interface ApiOptions extends RequestInit {
   body?: BodyInit | null;
 }
 
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  token: string;
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+  };
+}
+
 async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
   const response = await fetch(`${API_URL}${endpoint}`, {
     headers: {
@@ -13,10 +26,10 @@ async function request<T>(endpoint: string, options: ApiOptions = {}): Promise<T
     ...options,
   });
 
-  const data = await response.json();
+  const data = (await response.json()) as T & { message?: string };
 
   if (!response.ok) {
-    throw new Error(data.message || "Something went wrong");
+    throw new Error((data as { message?: string }).message || "Something went wrong");
   }
 
   return data;
@@ -42,13 +55,13 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
 export const authApi = {
   register: (payload: unknown) =>
-    request("/auth/register", {
+    request<AuthResponse>("/auth/register", {
       method: "POST",
       body: JSON.stringify(payload),
     }),
 
   login: (payload: unknown) =>
-    request("/auth/login", {
+    request<AuthResponse>("/auth/login", {
       method: "POST",
       body: JSON.stringify(payload),
     }),

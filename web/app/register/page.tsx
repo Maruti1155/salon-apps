@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authApi } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -39,6 +41,7 @@ export default function RegisterPage() {
         email: "",
         password: "",
       });
+      router.replace("/login");
     } catch (error) {
       setMessage(
         error instanceof Error ? error.message : "Server connection failed"
@@ -105,7 +108,7 @@ export default function RegisterPage() {
         </form>
 
         {message && (
-          <p className="mt-4 text-center text-sm">{message}</p>
+          <p className="mt-4 text-center text-sm text-red-600">{message}</p>
         )}
 
         <p className="mt-6 text-center">

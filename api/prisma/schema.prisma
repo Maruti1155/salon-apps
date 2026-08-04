@@ -50,18 +50,22 @@ model Customer {
 model Service {
 
   id          Int      @id @default(autoincrement())
-
+  
   name        String
-
+  
   description String?
-
+  
+  duration    Int      // Duration in minutes
+  
   price       Float
+  
+  isActive    Boolean  @default(true)
 
   createdAt   DateTime @default(now())
-
+  
+  updatedAt   DateTime @updatedAt
 
   appointments Appointment[]
-
 }
 
 

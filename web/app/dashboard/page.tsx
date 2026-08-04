@@ -75,19 +75,40 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      <header className="flex items-center justify-between bg-white px-8 py-4 shadow">
-        <div>
-          <h1 className="text-2xl font-bold">Salon Management System</h1>
+      <header className="bg-white px-8 py-4 shadow">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Salon Management System</h1>
+            <p className="text-sm text-gray-500">Welcome to your dashboard</p>
+          </div>
 
-          <p className="text-sm text-gray-500">Welcome to your dashboard</p>
+          <nav className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => router.push("/dashboard/services")}
+              className="rounded bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+            >
+              Services
+            </button>
+            <button
+              onClick={() => router.push("/dashboard/customers")}
+              className="rounded bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+            >
+              Customers
+            </button>
+            <button
+              onClick={() => router.push("/dashboard/appointments")}
+              className="rounded bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+            >
+              Appointments
+            </button>
+            <button
+              onClick={handleLogout}
+              className="rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+            >
+              Logout
+            </button>
+          </nav>
         </div>
-
-        <button
-          onClick={handleLogout}
-          className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-        >
-          Logout
-        </button>
       </header>
 
       <section className="mx-auto max-w-7xl p-8">
