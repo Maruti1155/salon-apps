@@ -4,8 +4,11 @@ import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.get("/", authMiddleware, async (_req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
+
   const customers = await prisma.customer.findMany({
+    where: user.role === "SUPER_ADMIN" ? {} : { organizationId: user.organizationId ?? undefined },
     orderBy: { createdAt: "desc" },
   });
 
@@ -16,6 +19,7 @@ router.get("/", authMiddleware, async (_req, res) => {
 });
 
 router.get("/:id", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
   const { id } = req.params;
 
   const customer = await prisma.customer.findUnique({
@@ -29,6 +33,13 @@ router.get("/:id", authMiddleware, async (req, res) => {
     });
   }
 
+  if (user.role !== "SUPER_ADMIN" && customer.organizationId !== user.organizationId) {
+    return res.status(403).json({
+      success: false,
+      message: "You can only access customers from your salon",
+    });
+  }
+
   return res.json({
     success: true,
     data: customer,
@@ -36,6 +47,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
 });
 
 router.post("/", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
   const { name, phone, email, address } = req.body ?? {};
 
   if (!name || !phone) {
@@ -45,12 +57,21 @@ router.post("/", authMiddleware, async (req, res) => {
     });
   }
 
+  if (user.role !== "SUPER_ADMIN" && !user.organizationId) {
+    return res.status(403).json({
+      success: false,
+      message: "Your account is not linked to any salon",
+    });
+  }
+
   const customer = await prisma.customer.create({
     data: {
       name: String(name).trim(),
       phone: String(phone).trim(),
       email: email ? String(email).trim() : null,
       address: address ? String(address).trim() : null,
+      organizationId: user.role === "SUPER_ADMIN" ? null : user.organizationId,
+      createdById: user.id,
     },
   });
 
@@ -62,6 +83,7 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 router.put("/:id", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
   const { id } = req.params;
   const { name, phone, email, address } = req.body ?? {};
 
@@ -73,6 +95,13 @@ router.put("/:id", authMiddleware, async (req, res) => {
     return res.status(404).json({
       success: false,
       message: "Customer not found",
+    });
+  }
+
+  if (user.role !== "SUPER_ADMIN" && existingCustomer.organizationId !== user.organizationId) {
+    return res.status(403).json({
+      success: false,
+      message: "You can only update customers from your salon",
     });
   }
 
@@ -94,6 +123,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
 });
 
 router.delete("/:id", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
   const { id } = req.params;
 
   const customer = await prisma.customer.findUnique({
@@ -104,6 +134,13 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     return res.status(404).json({
       success: false,
       message: "Customer not found",
+    });
+  }
+
+  if (user.role !== "SUPER_ADMIN" && customer.organizationId !== user.organizationId) {
+    return res.status(403).json({
+      success: false,
+      message: "You can only delete customers from your salon",
     });
   }
 

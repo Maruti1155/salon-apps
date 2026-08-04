@@ -32,6 +32,7 @@ const registerParlorUser = async (req: any, res: any) => {
     organizationSlug,
     organizationPhone,
     organizationEmail,
+    organizationAddress,
   } = req.body ?? {};
 
   if (!firstName || !lastName || !email || !password) {
@@ -65,6 +66,7 @@ const registerParlorUser = async (req: any, res: any) => {
           slug: String(organizationSlug || organizationName).trim().toLowerCase().replace(/\s+/g, "-"),
           phone: organizationPhone ? String(organizationPhone).trim() : null,
           email: organizationEmail ? String(organizationEmail).trim().toLowerCase() : null,
+          address: organizationAddress ? String(organizationAddress).trim() : null,
         },
       })
     : null;

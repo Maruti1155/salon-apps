@@ -16,10 +16,11 @@ export default function ParlorRegisterPage() {
     organizationSlug: "",
     organizationPhone: "",
     organizationEmail: "",
+    organizationAddress: "",
   });
   const [message, setMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -52,6 +53,7 @@ export default function ParlorRegisterPage() {
 
           <input name="organizationName" placeholder="Parlor name" className="rounded border p-3 md:col-span-2" onChange={handleChange} required />
           <input name="organizationSlug" placeholder="Parlor slug (for URL / internal id)" className="rounded border p-3 md:col-span-2" onChange={handleChange} required />
+          <textarea name="organizationAddress" placeholder="Parlor address" className="rounded border p-3 md:col-span-2" onChange={handleChange} required />
           <input name="organizationPhone" placeholder="Parlor phone" className="rounded border p-3" onChange={handleChange} />
           <input name="organizationEmail" type="email" placeholder="Parlor email" className="rounded border p-3" onChange={handleChange} />
 

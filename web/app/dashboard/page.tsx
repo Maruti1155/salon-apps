@@ -83,6 +83,14 @@ export default function DashboardPage() {
           </div>
 
           <nav className="flex flex-wrap items-center gap-2">
+            {user?.role === "SUPER_ADMIN" && (
+              <button
+                onClick={() => router.push("/dashboard/parlors")}
+                className="rounded bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"
+              >
+                Parlors
+              </button>
+            )}
             <button
               onClick={() => router.push("/dashboard/services")}
               className="rounded bg-black px-3 py-2 text-sm text-white hover:bg-gray-800"

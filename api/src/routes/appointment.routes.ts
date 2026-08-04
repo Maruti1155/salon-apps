@@ -5,8 +5,15 @@ import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.get("/", authMiddleware, async (_req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
+
   const appointments = await prisma.appointment.findMany({
+    where: user.role === "SUPER_ADMIN"
+      ? {}
+      : user.role === "CUSTOMER"
+        ? { customer: { id: Number(user.id) } }
+        : { organizationId: user.organizationId ?? undefined },
     include: {
       customer: true,
       service: true,
@@ -21,6 +28,7 @@ router.get("/", authMiddleware, async (_req, res) => {
 });
 
 router.get("/:id", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
   const { id } = req.params;
 
   const appointment = await prisma.appointment.findUnique({
@@ -38,6 +46,22 @@ router.get("/:id", authMiddleware, async (req, res) => {
     });
   }
 
+  if (user.role !== "SUPER_ADMIN" && user.role !== "ADMIN" && user.role !== "STAFF") {
+    if (appointment.customerId !== Number(user.id)) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only access your own appointments",
+      });
+    }
+  }
+
+  if (user.role !== "SUPER_ADMIN" && user.role !== "CUSTOMER" && appointment.organizationId !== user.organizationId) {
+    return res.status(403).json({
+      success: false,
+      message: "You can only access appointments from your salon",
+    });
+  }
+
   return res.json({
     success: true,
     data: appointment,
@@ -45,6 +69,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
 });
 
 router.post("/", authMiddleware, async (req, res) => {
+  const user = (req as any).user;
   const { customerId, serviceId, appointmentDate, status, amount } = req.body ?? {};
 
   if (!customerId || !serviceId || !appointmentDate) {
@@ -52,6 +77,15 @@ router.post("/", authMiddleware, async (req, res) => {
       success: false,
       message: "Customer, service, and appointment date are required",
     });
+  }
+
+  if (user.role === "CUSTOMER") {
+    if (Number(customerId) !== Number(user.id)) {
+      return res.status(403).json({
+        success: false,
+        message: "Customers can only create appointments for themselves",
+      });
+    }
   }
 
   const customer = await prisma.customer.findUnique({
@@ -94,6 +128,7 @@ router.post("/", authMiddleware, async (req, res) => {
     data: {
       customerId: Number(customerId),
       serviceId: Number(serviceId),
+      organizationId: user.role === "SUPER_ADMIN" ? undefined : user.organizationId ?? service.organizationId ?? customer.organizationId,
       appointmentDate: new Date(appointmentDate),
       status: normalizedStatus,
       amount: amount !== undefined ? Number(amount) : Number(service.price),

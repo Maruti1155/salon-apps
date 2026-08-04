@@ -1,6 +1,22 @@
 import { apiFetch } from "./api";
 
 export const salonApi = {
+  getOrganizations: () => apiFetch("/organizations").then((res) => res.json()),
+  createOrganization: (payload: unknown) =>
+    apiFetch("/organizations", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }).then((res) => res.json()),
+  updateOrganization: (id: number, payload: unknown) =>
+    apiFetch(`/organizations/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }).then((res) => res.json()),
+  deleteOrganization: (id: number) =>
+    apiFetch(`/organizations/${id}`, {
+      method: "DELETE",
+    }).then((res) => res.json()),
+
   getServices: () => apiFetch("/services").then((res) => res.json()),
   createService: (payload: unknown) =>
     apiFetch("/services", {
