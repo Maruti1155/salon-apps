@@ -1,0 +1,36 @@
+# Dependencies (all apps)
+**/node_modules/
+
+# Next.js
+**/.next/
+**/out/
+
+# React Native
+**/android/.gradle/
+**/android/app/build/
+**/ios/Pods/
+**/ios/build/
+
+# Environment files
+**/.env
+**/.env.*
+!.env.example
+
+# Logs
+**/*.log
+
+# Build files
+**/dist/
+**/build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Cache
+.npm/
+.yarn/
